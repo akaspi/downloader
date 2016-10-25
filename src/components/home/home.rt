@@ -1,0 +1,3 @@
+<rt-require dependency="./home.scss" as="homeStyle"></rt-require>
+
+<div class="home">Hello, Webpack-On-heroku!</div>
