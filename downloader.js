@@ -4,19 +4,11 @@ const fs = require('fs');
 const http = require('http');
 const https = require('https');
 const ProgressBar = require('progress');
-const firebase = require('firebase');
 const url = require('url');
-const config = require('./config');
 
-firebase.initializeApp(config.firebse);
-
-const downloadsRef = firebase.database().ref();
-
-function downloadFile(snapshot) {
-    const urlToDownload = snapshot.val();
-    const key = snapshot.key;
+module.exports = function download(urlToDownload) {
     const filename = path.basename(urlToDownload);
-    const destinationFilePath = fs.createWriteStream(path.join(__dirname, `${config.dist}/${filename}`));
+    const destinationFilePath = fs.createWriteStream(path.join(__dirname, `dist/${filename}`));
     const requestFunc = url.parse(urlToDownload).protocol === 'http:' ? http : https;
 
     requestFunc.get(urlToDownload, response => {
@@ -31,8 +23,6 @@ function downloadFile(snapshot) {
 
         response.on('data', chunk => bar.tick(chunk.length));
 
-        response.on('end', () => downloadsRef.child(key).remove());
+        response.on('end', () => console.log('done'));
     });
-}
-
-downloadsRef.on('child_added', downloadFile);
+};
