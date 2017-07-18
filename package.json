@@ -2,7 +2,9 @@
   "name": "downloader",
   "version": "1.0.0",
   "description": "downloader",
-  "scripts": {},
+  "scripts": {
+    "start": "electron index.js"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/akaspi/downloader.git"
@@ -13,5 +15,8 @@
   "bugs": {
     "url": "https://github.com/akaspi/downloader/issues"
   },
-  "homepage": "https://github.com/akaspi/downloader#readme"
+  "homepage": "https://github.com/akaspi/downloader#readme",
+  "dependencies": {
+    "electron": "^1.6.11"
+  }
 }
