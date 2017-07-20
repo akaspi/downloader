@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "description": "downloader",
   "scripts": {
-    "start": "electron index.js"
+    "start": "electron index.js",
+    "build": "webpack"
   },
   "repository": {
     "type": "git",
