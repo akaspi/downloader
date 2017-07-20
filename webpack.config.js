@@ -3,7 +3,7 @@ const path = require('path');
 module.exports = {
     cache: true,
 
-    devtool: 'cheap-eval-source-map',
+    devtool: 'inline-source-map',
 
     entry: './client/index.jsx',
 
@@ -21,5 +21,7 @@ module.exports = {
 
     resolve: {
         extensions: ['.js', '.jsx', '.json']
-    }
+    },
+
+    target: 'electron-renderer'
 };
