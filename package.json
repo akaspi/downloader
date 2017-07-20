@@ -25,6 +25,7 @@
     "babel-plugin-transform-react-jsx": "^6.24.1",
     "babel-preset-env": "^1.6.0",
     "electron": "^1.6.11",
+    "mkdirp": "^0.5.1",
     "react": "^15.6.1",
     "react-dom": "^15.6.1",
     "webpack": "^3.3.0"

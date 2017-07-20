@@ -3,15 +3,32 @@ const fs = require('fs');
 const http = require('http');
 const https = require('https');
 const url = require('url');
+const DOWNLOAD_FOLDER = 'downloads';
+const mkdirp = require('mkdirp');
 
-module.exports = function download(urlToDownload, options = {}) {
-    const filename = path.basename(urlToDownload);
-    const destinationFilePath = fs.createWriteStream(path.join(__dirname, `dist/${filename}`));
+function extractFileName(url, response) {
+    const contentDisposition = response.headers['content-disposition'];
+    const match = contentDisposition && contentDisposition.match(/(filename=|filename\*='')(.*)$/);
+
+    return (match && match[2]) || path.basename(url);
+}
+
+function download(urlToDownload, options = {}) {
     const requestFunc = url.parse(urlToDownload).protocol === 'http:' ? http : https;
 
     requestFunc.get(urlToDownload, response => {
 
-        response.pipe(destinationFilePath);
+        if (response.statusCode !== 200) {
+            throw new Error('Request Failed.\n' + `Status Code: ${statusCode}`);
+        }
+
+        mkdirp.sync(DOWNLOAD_FOLDER);
+
+        const fileName = extractFileName(urlToDownload, response);
+        const filePath = path.join(__dirname, `${DOWNLOAD_FOLDER}/${fileName}`);
+        const destinationFileStream = fs.createWriteStream(filePath);
+
+        response.pipe(destinationFileStream);
 
         if (typeof options.start === 'function') {
             options.start({
@@ -29,5 +46,9 @@ module.exports = function download(urlToDownload, options = {}) {
             response.on('end', () => options.end());
         }
 
+        response.on('error', e => console.log(`Got error: ${e.message}`));
+
     });
-};
+}
+
+module.exports = download;
