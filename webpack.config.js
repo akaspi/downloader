@@ -5,7 +5,7 @@ module.exports = {
 
     devtool: 'cheap-eval-source-map',
 
-    entry: './client/index.js',
+    entry: './client/index.jsx',
 
     output: {
         path: path.resolve(__dirname),
