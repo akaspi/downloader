@@ -21,7 +21,7 @@ app.on('ready', () => {
     });
 
     ipcMain.on('download-file', (event, props) => {
-        downloader(props.fileUrl, {
+        downloader(props.url, {
             start: ({ total }) => mainWindow.send('download-start', { total }),
             on: ({ chunk }) => mainWindow.send('download-on', { chunk }),
             end: () => mainWindow.send('download-end')

@@ -1,50 +1,38 @@
 import React from 'react';
-import { ipcRenderer } from 'electron';
-
-function getDownloadPercent(total, downloaded) {
-    if (total === 0) {
-        return total;
-    }
-    return Math.floor(downloaded / total * 100)
-}
+import DownloadItem from './DownloadItem';
 
 export default class Root extends React.Component {
     constructor() {
         super();
         this.state = {
-            total: 0,
-            downloaded: 0
+            downloadQueue: []
         };
     }
 
     handleClick = () => {
-        ipcRenderer.send('download-file', {
-            fileUrl: this.refs.fileInput.value
-        });
-
-        ipcRenderer.on('download-start', (event, props) => {
-            this.setState({
-                total: props.total
-            });
-        });
-
-        ipcRenderer.on('download-on', (event, props) => {
-            this.setState({
-                downloaded: this.state.downloaded + props.chunk
-            });
-        });
-
-        ipcRenderer.on('download-end', () => {
-            ipcRenderer.removeAllListeners();
+        const fileUrl = this.refs.fileInput.value;
+        this.setState({
+            downloadQueue: this.state.downloadQueue.concat([ fileUrl ])
         });
     };
 
     render() {
+        if (this.state.downloadQueue.length === 0) {
+            return (
+                <div>
+                    <input placeholder='type file url...' ref='fileInput' />
+                    <button onClick={this.handleClick}>Download!</button>
+                    <div>Nothing to download...</div>
+                </div>
+            )
+        }
+
+        const currentDownload = this.state.downloadQueue[this.state.downloadQueue.length - 1];
         return (
             <div>
                 <input placeholder='type file url...' ref='fileInput' />
                 <button onClick={this.handleClick}>Download!</button>
-                <span id="progress">{`${getDownloadPercent(this.state.total, this.state.downloaded)}%`}</span>
+                <DownloadItem url={currentDownload}/>
             </div>
         )
     }
