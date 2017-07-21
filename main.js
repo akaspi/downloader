@@ -21,10 +21,11 @@ app.on('ready', () => {
     });
 
     ipcMain.on('download-file', (event, props) => {
-        downloader(props.url, {
-            start: ({ total }) => mainWindow.send('download-start', { total }),
-            on: ({ chunk }) => mainWindow.send('download-on', { chunk }),
-            end: () => mainWindow.send('download-end')
+        const { url } = props;
+        downloader(url, {
+            start: ({ total }) => mainWindow.send('download-start', { url, total }),
+            on: ({ chunk }) => mainWindow.send('download-on', { url, chunk }),
+            end: () => mainWindow.send('download-end', { url })
         });
     });
 });

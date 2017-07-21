@@ -1,6 +1,5 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { download } from '../utils/downloadUtils';
 
 function getDownloadPercent(total, chunk) {
     if (total === 0) {
@@ -10,36 +9,23 @@ function getDownloadPercent(total, chunk) {
 }
 
 export default class DownloadItem extends React.Component {
-    constructor() {
-        super();
-
-        this.state = {
-            fileSize: 0,
-            chunk: 0
-        };
-    }
-
-    setFileSize = ({ fileSize }) => {
-        this.setState({ fileSize });
-    };
-
-    updateDownloadChunk = ({ chunk }) => {
-        this.setState({ chunk: this.state.chunk + chunk });
-    };
-
     componentDidMount() {
-        download(this.props.url, this.setFileSize, this.updateDownloadChunk, () => {
-            console.log('END');
-        })
+        this.props.download(this.props.url);
     }
 
     render() {
+        const percent = getDownloadPercent(this.props.fileSize, this.props.chunk);
         return (
-            <span>{`${getDownloadPercent(this.state.fileSize, this.state.chunk)}%`}</span>
+            <div>
+                <h4>{`Downloading: ${this.props.url} - ${percent}%`}</h4>
+            </div>
         );
     }
 };
 
 DownloadItem.propTypes = {
-    url: PropTypes.string.isRequired
+    url: PropTypes.string.isRequired,
+    fileSize: PropTypes.number.isRequired,
+    chunk: PropTypes.number.isRequired,
+    download: PropTypes.func.isRequired
 };
