@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { observer, inject } from 'mobx-react';
 
 function getDownloadPercent(total, chunk) {
     if (total === 0) {
@@ -8,24 +9,21 @@ function getDownloadPercent(total, chunk) {
     return Math.floor(chunk / total * 100)
 }
 
-export default class DownloadItem extends React.Component {
-    componentDidMount() {
-        this.props.download(this.props.url);
-    }
-
+class DownloadItem extends React.Component {
     render() {
-        const percent = getDownloadPercent(this.props.fileSize, this.props.chunk);
+        const { fileSize, chunk } = this.props.store.getDownloadStatus(this.props.url);
+        const percent = getDownloadPercent(fileSize, chunk);
         return (
             <div>
                 <h4>{`Downloading: ${this.props.url} - ${percent}%`}</h4>
             </div>
         );
     }
-};
+}
 
 DownloadItem.propTypes = {
     url: PropTypes.string.isRequired,
-    fileSize: PropTypes.number.isRequired,
-    chunk: PropTypes.number.isRequired,
-    download: PropTypes.func.isRequired
+    store: PropTypes.object.isRequired
 };
+
+export default inject('store')(observer(DownloadItem));

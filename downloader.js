@@ -13,7 +13,7 @@ function extractFileName(url, response) {
     return (match && match[2]) || path.basename(url);
 }
 
-function download(urlToDownload, options = {}) {
+function download(urlToDownload, cb) {
     const requestFunc = url.parse(urlToDownload).protocol === 'http:' ? http : https;
 
     requestFunc.get(urlToDownload, response => {
@@ -30,21 +30,13 @@ function download(urlToDownload, options = {}) {
 
         response.pipe(destinationFileStream);
 
-        if (typeof options.start === 'function') {
-            options.start({
-                total: parseInt(response.headers['content-length'], 10)
-            });
-        }
+        const fileSize = parseInt(response.headers['content-length'], 10);
 
-        if (typeof options.on === 'function') {
-            response.on('data', chunk => options.on({
-                chunk: chunk.length
-            }));
-        }
+        cb({ fileSize, chunk: 0 });
 
-        if (typeof options.end === 'function') {
-            response.on('end', () => options.end());
-        }
+        response.on('data', chunk => {
+            cb({ fileSize, chunk: chunk.length });
+        });
 
         response.on('error', e => console.log(`Got error: ${e.message}`));
 

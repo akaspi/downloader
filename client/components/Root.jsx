@@ -1,66 +1,17 @@
 import React from 'react';
-import { init, download, MESSAGE_TYPES } from '../utils/downloadsHandler';
+import PropTypes from 'prop-types';
+import { observer, inject } from 'mobx-react';
 import DownloadItem from './DownloadItem';
 
-export default class Root extends React.Component {
-    constructor() {
-        super();
-        this.state = {
-            downloads: {}
-        }
-    }
-
-    componentWillMount() {
-        init(this.handleDownloadMessage);
-    }
-
-    handleDownloadMessage = message => {
-      switch (message.type) {
-          case MESSAGE_TYPES.DOWNLOAD_START: {
-              const { url, fileSize } = message;
-              const newDownloads = Object.assign({}, this.state.downloads);
-              newDownloads[url].fileSize = fileSize;
-              this.setState({ downloads: newDownloads});
-              break;
-          }
-
-          case MESSAGE_TYPES.DOWNLOADING: {
-              const { url, chunk } = message;
-              let newDownloads = Object.assign({}, this.state.downloads);
-              newDownloads[url].chunk = newDownloads[url].chunk + chunk;
-              this.setState({ downloads: newDownloads});
-              break;
-          }
-
-          case MESSAGE_TYPES.DOWNLOAD_END: {
-
-          }
-
-      }
-    };
+class Root extends React.Component {
 
     handleClick = () => {
         const url = this.refs.fileInput.value;
-        const newDownloads = Object.assign({}, this.state.downloads);
-        newDownloads[url] = { fileSize: 0, chunk: 0 };
-
-        this.setState({
-            downloads: newDownloads
-        });
+        this.props.store.startDownload(url);
     };
 
-    createDownloadsList = () => {
-        return Object.keys(this.state.downloads).map(url => {
-            const downloadData = this.state.downloads[url];
-            return (
-                <DownloadItem
-                    url={url}
-                    fileSize={downloadData.fileSize}
-                    chunk={downloadData.chunk}
-                    download={download}
-                />
-            );
-        });
+    createDownloadsList = (urls) => {
+        return urls.map(url => <DownloadItem key={url} url={url} />);
     };
 
     render() {
@@ -70,10 +21,16 @@ export default class Root extends React.Component {
               <button onClick={this.handleClick}>Download!</button>
 
               {
-                  Object.keys(this.state.downloads).length === 0 ?
-                    <span>Nothing to download...</span> : this.createDownloadsList()
+                  this.props.store.urlsToDownload.length === 0 ?
+                    <span>Nothing to download...</span> : this.createDownloadsList(this.props.store.urlsToDownload)
               }
           </div>
         );
     }
 }
+
+Root.propTypes = {
+    store: PropTypes.object.isRequired
+};
+
+export default inject('store')(observer(Root));

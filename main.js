@@ -22,10 +22,14 @@ app.on('ready', () => {
 
     ipcMain.on('download-file', (event, props) => {
         const { url } = props;
-        downloader(url, {
-            start: ({ total }) => mainWindow.send('download-start', { url, total }),
-            on: ({ chunk }) => mainWindow.send('download-on', { url, chunk }),
-            end: () => mainWindow.send('download-end', { url })
+
+        downloader(url, status => {
+            mainWindow.send('download-status', {
+                url,
+                fileSize: status.fileSize,
+                chunk: status.chunk
+            });
         });
     });
+
 });
