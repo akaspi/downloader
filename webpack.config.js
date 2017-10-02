@@ -5,11 +5,13 @@ module.exports = {
 
     devtool: 'inline-source-map',
 
-    entry: './client/index.jsx',
+    entry: {
+        store: './Store/Store.js'
+    },
 
     output: {
-        path: path.resolve(__dirname),
-        filename: 'renderer.js'
+        path: path.resolve(__dirname, 'dist'),
+        filename: '[name].bundle.js'
     },
 
     module: {
